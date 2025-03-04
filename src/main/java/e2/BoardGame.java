@@ -1,24 +1,28 @@
 package e2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class BoardGame {
-    private final Pawn pawn;
-    private final Knight knight;
+    private final List<ChessPiece> pieces;
     private final Random random = new Random();
     private final int size;
 
     public BoardGame(int size) {
         this.size = size;
-        this.pawn = new Pawn(this.randomEmptyPosition());
-        this.knight = new Knight(this.randomEmptyPosition(), this.size);
+        this.pieces = new ArrayList<>();
+        this.pieces.add(new Pawn(this.randomEmptyPosition()));
+        this.pieces.add(new Knight(this.randomEmptyPosition(), this.size));
     }
 
-    private final Pair<Integer,Integer> randomEmptyPosition(){
-        Pair<Integer,Integer> pos = new Pair<>(this.random.nextInt(size),this.random.nextInt(size));
-        // Check both pawn and knight to prevent any conflict
-        return (this.pawn!=null && this.pawn.getPosition().equals(pos)) || (this.knight!=null && this.knight.getPosition().equals(pos))  ? randomEmptyPosition() : pos;
+    private Pair<Integer, Integer> randomEmptyPosition() {
+        Pair<Integer, Integer> pos = new Pair<>(this.random.nextInt(size), this.random.nextInt(size));
+        boolean isOccupied = pieces.stream()
+                .anyMatch(piece -> piece.getPosition().equals(pos));
+        return isOccupied ? randomEmptyPosition() : pos;
     }
+
 
     public boolean inBoardMove(Pair<Integer, Integer> pos) {
         int row = pos.getX();
@@ -27,15 +31,23 @@ public class BoardGame {
     }
 
     public Knight getKnight() {
-        return knight;
+        return pieces.stream()
+                .filter(piece -> piece instanceof Knight)
+                .map(piece -> (Knight) piece)
+                .findFirst()
+                .orElse(null);
     }
 
     public Pawn getPawn() {
-        return pawn;
+        return pieces.stream()
+                .filter(piece -> piece instanceof Pawn)
+                .map(piece -> (Pawn) piece)
+                .findFirst()
+                .orElse(null);
     }
 
     boolean endGame(){
-        return this.pawn.getPosition().equals(this.knight.getPosition());
+        return this.getPawn().getPosition().equals(this.getKnight().getPosition());
     }
 
 }
