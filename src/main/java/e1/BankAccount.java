@@ -8,7 +8,4 @@ public interface BankAccount {
 
     public void withdraw(int amount);
 
-    public int getSelectedType();
-
-    public void setSelectedType(int selectedType);
 }
