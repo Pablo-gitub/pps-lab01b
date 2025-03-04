@@ -8,35 +8,64 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BankAccountTest {
 
-    private BankAccount account;
+    private SilverBankAccount bronzeAccount;
+    private SilverBankAccount goldAccount;
 
     @BeforeEach
     void init(){
-        this.account = new BankAccount();
+        this.bronzeAccount = new SilverBankAccount();
+        this.bronzeAccount.setSelectedType(0); //Useless by default is set Bronze account
+        this.goldAccount = new SilverBankAccount();
+        this.goldAccount.setSelectedType(1);
     }
 
     @Test
     public void testInitiallyEmpty() {
-        assertEquals(0, this.account.getBalance());
+        assertEquals(0, this.bronzeAccount.getBalance());
     }
 
     @Test
     public void testCanDeposit() {
-        this.account.deposit(1000);
-        assertEquals(1000, this.account.getBalance());
+        this.bronzeAccount.deposit(1000);
+        assertEquals(1000, this.bronzeAccount.getBalance());
     }
 
     @Test
     public void testCanWithdraw() {
-        this.account.deposit(1000);
-        this.account.withdraw(200);
-        assertEquals(799, this.account.getBalance());
+        this.bronzeAccount.deposit(1000);
+        this.bronzeAccount.withdraw(200);
+        assertEquals(799, this.bronzeAccount.getBalance());
     }
 
     @Test
     public void testCannotWithdrawMoreThanAvailable(){
-        this.account.deposit(1000);
-        assertThrows(IllegalStateException.class, () -> this.account.withdraw(1200));
+        this.bronzeAccount.deposit(1000);
+        assertThrows(IllegalStateException.class, () -> this.bronzeAccount.withdraw(1200));
+    }
+
+    @Test
+    public void testGoldAmount() {
+        this.goldAccount.setSelectedType(1);
+        this.goldAccount.deposit(1000);
+        assertEquals(1000, this.goldAccount.getBalance());
+    }
+
+    @Test
+    public void testGoldAmountWithdrawOverdraftAmount() {
+        this.goldAccount.setSelectedType(1);
+        this.goldAccount.deposit(1000);
+        this.goldAccount.withdraw(1200);
+        assertEquals(-200, this.goldAccount.getBalance());
+    }
+
+    @Test
+    public void testGoldAmountWithdrawOverOverdraftAmount() {
+        this.goldAccount.setSelectedType(1);
+        this.goldAccount.deposit(1000);
+        Exception exception = assertThrows(IllegalStateException.class, ()->{
+            this.goldAccount.withdraw(1501);
+        });
+        assertEquals("Money exceeds overdraft amount", exception.getMessage());
     }
 
 }
