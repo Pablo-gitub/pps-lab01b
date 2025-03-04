@@ -20,12 +20,12 @@ public class LogicTest {
 
   @Test
   public void testFindPawn(){
-      assertNotNull(this.logics.getPawn());
+      assertNotNull(this.logics.getPawnPosition());
   }
 
   @Test
   public void testFindKnight(){
-      assertNotNull(this.logics.getKnight());
+      assertNotNull(this.logics.getKnightPosition());
   }
 
   private List<Pair<Integer, Integer>> invalidMoves(Pair<Integer, Integer> knight) {
@@ -64,38 +64,38 @@ public class LogicTest {
 
   @Test
   public void testKnightCannotMoveToInvalidPosition() {
-    Pair<Integer, Integer> knight = this.logics.getKnight();
+    Pair<Integer, Integer> knight = this.logics.getKnightPosition();
     List<Pair<Integer, Integer>> invalidMoves = this.invalidMoves(knight);
     for(Pair<Integer, Integer> invalidMove : invalidMoves){
       this.logics.hit(invalidMove.getX(), invalidMove.getY());
     }
-    assertEquals(this.logics.getKnight(), knight);
+    assertEquals(this.logics.getKnightPosition(), knight);
   }
 
   @Test
   public void testKnightCanMoveToValidPositions() {
-    Pair<Integer, Integer> initialPosition = this.logics.getKnight();
+    Pair<Integer, Integer> initialPosition = this.logics.getKnightPosition();
     List<Pair<Integer, Integer>> validMoves = this.validMoves(initialPosition);
 
     for (Pair<Integer, Integer> validMove : validMoves) {
       this.logics.hit(validMove.getX(), validMove.getY());
-      assertEquals(validMove, this.logics.getKnight());
+      assertEquals(validMove, this.logics.getKnightPosition());
       this.logics.hit(initialPosition.getX(), initialPosition.getY());
     }
   }
 
   @Test
   public void testEndGame(){
-    List<Pair<Integer, Integer>> validMoves = this.validMoves(logics.getKnight());
+    List<Pair<Integer, Integer>> validMoves = this.validMoves(logics.getKnightPosition());
     boolean endGame;
-    while(!validMoves.contains(logics.getPawn())){
+    while(!validMoves.contains(logics.getPawnPosition())){
       Random random = new Random();
       Pair<Integer, Integer> validMove = validMoves.get(random.nextInt(validMoves.size()));
       endGame = logics.hit(validMove.getX(), validMove.getY());
       assertFalse(endGame);
-      validMoves = this.validMoves(logics.getKnight());
+      validMoves = this.validMoves(logics.getKnightPosition());
     }
-    endGame = logics.hit(logics.getPawn().getX(), logics.getPawn().getY());
+    endGame = logics.hit(logics.getPawnPosition().getX(), logics.getPawnPosition().getY());
     assertTrue(endGame);
   }
 
