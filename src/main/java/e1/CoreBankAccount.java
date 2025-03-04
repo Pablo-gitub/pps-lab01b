@@ -1,6 +1,6 @@
 package e1;
 
-class CoreBankAccount {
+public class CoreBankAccount {
 
     private int balance = 0;
 

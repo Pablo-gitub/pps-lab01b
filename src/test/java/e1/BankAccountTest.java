@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BankAccountTest {
 
-    private SilverBankAccount silverAccount;
+    private BankAccount silverAccount;
     private BankAccount goldAccount;
     private BankAccount bronzeAccount;
 
     @BeforeEach
     void init(){
-        this.silverAccount = new SilverBankAccount(); //Useless by default is set Bronze account
+        this.silverAccount = new SilverBankAccount(new CoreBankAccount()); //Useless by default is set Bronze account
         this.goldAccount = new GoldBankAccount(new CoreBankAccount());
         this.bronzeAccount = new BronzeBankAccount(new CoreBankAccount());
     }
