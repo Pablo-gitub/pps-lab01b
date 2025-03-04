@@ -44,7 +44,7 @@ public class BankAccountTest {
     }
 
     @Test
-    public void testGoldAmount() {;
+    public void testGoldAmount() {
         this.goldAccount.deposit(1000);
         assertEquals(1000, this.goldAccount.getBalance());
     }
@@ -59,9 +59,7 @@ public class BankAccountTest {
     @Test
     public void testGoldAmountWithdrawOverOverdraftAmount() {
         this.goldAccount.deposit(1000);
-        Exception exception = assertThrows(IllegalStateException.class, ()->{
-            this.goldAccount.withdraw(1501);
-        });
+        Exception exception = assertThrows(IllegalStateException.class, ()-> this.goldAccount.withdraw(1501));
         assertEquals("Money exceeds overdraft amount", exception.getMessage());
     }
 
@@ -74,9 +72,7 @@ public class BankAccountTest {
     @Test
     public void testBronzeWithdrawOverdraftAmount() {
         this.bronzeAccount.deposit(1000);
-        Exception exception = assertThrows(IllegalStateException.class, ()->{
-            this.bronzeAccount.withdraw(1001);
-        });
+        Exception exception = assertThrows(IllegalStateException.class, ()-> this.bronzeAccount.withdraw(1001));
         assertEquals("Money exceeds overdraft amount", exception.getMessage());
     }
 
