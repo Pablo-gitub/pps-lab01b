@@ -10,7 +10,8 @@ public class BoardGame {
     }
     private final int size;
     private final List<Pair<Integer,Integer>> bombs;
-    private final List<Pair<Integer,Integer>> noBombs;
+    private final List<Pair<Integer,Integer>> selections;
+    private final List<Pair<Integer,Integer>> flags;
     private final Difficulty difficulty;
 
 
@@ -18,7 +19,8 @@ public class BoardGame {
         this.size = size;
         difficulty = Difficulty.EASY;
         this.bombs = new ArrayList<>();
-        this.noBombs = new ArrayList<>();
+        this.selections = new ArrayList<>();
+        this.flags = new ArrayList<>();
         setBomb();
     }
 
@@ -33,12 +35,16 @@ public class BoardGame {
         }
     }
 
+    public List<Pair<Integer, Integer>> getFlags() {
+        return this.flags;
+    }
+
     public List<Pair<Integer, Integer>> getBombs() {
         return this.bombs;
     }
 
-    public List<Pair<Integer, Integer>> getNoBombs() {
-        return this.noBombs;
+    public List<Pair<Integer, Integer>> getSelections() {
+        return this.selections;
     }
 
     private int numberOfBomb() {
@@ -53,6 +59,20 @@ public class BoardGame {
 
     public boolean isABomb(Pair<Integer,Integer> element){
         return this.bombs.contains(element);
+    }
+
+    public boolean isAFlag(Pair<Integer,Integer> element){
+        return this.flags.contains(element);
+    }
+
+    public void addFlag(Pair<Integer,Integer> element){
+        if(!this.selections.contains(element) && !this.flags.contains(element)){
+            this.flags.add(element);
+        }
+    }
+
+    public void removeFlag(Pair<Integer,Integer> element){
+        this.flags.remove(element);
     }
 
     public boolean inBoard(int row, int col) {
@@ -72,13 +92,13 @@ public class BoardGame {
         return closeBombs;
     }
 
-    public void addNoBombs(Pair<Integer, Integer> element){
-        if(!isABomb(element) && inBoard(element.getX(),element.getY())){
-            this.noBombs.add(element);
+    public void addSelections(Pair<Integer, Integer> element){
+        if(!isABomb(element) && inBoard(element.getX(),element.getY()) && !this.selections.contains(element)){
+            this.selections.add(element);
         }
     }
 
-    public boolean winGame(){
-        return this.noBombs.size() + this.bombs.size() == this.size*this.size;
+    public boolean winGame() {
+        return this.selections.size() == (this.size * this.size - this.bombs.size());
     }
 }

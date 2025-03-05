@@ -53,8 +53,8 @@ public class BoardGameTest {
     void testAddNoBombs() {
         Pair<Integer, Integer> safeCell = new Pair<>(0, 0);
         if (!board.isABomb(safeCell)) {
-            board.addNoBombs(safeCell);
-            assertTrue(board.getNoBombs().contains(safeCell));
+            board.addSelections(safeCell);
+            assertTrue(board.getSelections().contains(safeCell));
         }
     }
 
@@ -68,7 +68,7 @@ public class BoardGameTest {
         for(int i = 0 ; i < 10; i++) {
             for(int j = 0 ; j < 10; j++) {
                 Pair<Integer,Integer> element = new Pair<>(i, j);
-                this.board.addNoBombs(element);
+                this.board.addSelections(element);
             }
         }
         assertTrue(board.winGame());
