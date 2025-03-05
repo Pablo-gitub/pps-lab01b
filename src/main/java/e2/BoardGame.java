@@ -46,7 +46,7 @@ public class BoardGame {
                 .orElse(null);
     }
 
-    boolean endGame(){
+    public boolean endGame(){
         return this.getPawn().getPosition().equals(this.getKnight().getPosition());
     }
 
