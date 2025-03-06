@@ -1,11 +1,14 @@
 package e2;
 
+/**
+ * Class representing a Knight chess piece.
+ */
 public class Knight implements ChessPiece{
     private Pair<Integer,Integer> position;
     private final int size;
 
     public Knight(Pair<Integer, Integer> pos, int size){
-        setPosition(pos);
+        this.position = pos;
         this.size = size;
     }
 
@@ -29,11 +32,8 @@ public class Knight implements ChessPiece{
         }
     }
 
+    @Override
     public Pair<Integer, Integer> getPosition() {
         return this.position;
-    }
-
-    public void setPosition(Pair<Integer, Integer> position) {
-        this.position = position;
     }
 }

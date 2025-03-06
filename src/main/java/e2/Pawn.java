@@ -1,5 +1,8 @@
 package e2;
 
+/**
+ * Class representing a Pawn chess piece.
+ */
 public class Pawn implements ChessPiece {
     private Pair<Integer,Integer> position;
 

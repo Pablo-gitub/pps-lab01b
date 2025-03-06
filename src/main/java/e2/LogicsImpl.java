@@ -1,5 +1,9 @@
 package e2;
 
+/**
+ * Implementation of the Logics interface.
+ * Manages the game logic by handling moves and verifying game status.
+ */
 public class LogicsImpl implements Logics {
 
 	private final BoardGame game;
@@ -27,10 +31,20 @@ public class LogicsImpl implements Logics {
 		return this.game.getPawn().getPosition().equals(new Pair<>(row,col));
 	}
 
+	/**
+	 * Retrieves the current position of the Pawn.
+	 *
+	 * @return the Pawn's position as a Pair of coordinates
+	 */
 	public Pair<Integer,Integer> getPawnPosition() {
 		return this.game.getPawn().getPosition();
 	}
 
+	/**
+	 * Retrieves the current position of the Knight.
+	 *
+	 * @return the Knight's position as a Pair of coordinates
+	 */
 	public Pair<Integer,Integer> getKnightPosition() {
 		return this.game.getKnight().getPosition();
 	}
