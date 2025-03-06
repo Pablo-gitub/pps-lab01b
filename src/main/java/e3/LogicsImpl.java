@@ -5,7 +5,7 @@ package e3;
  */
 public class LogicsImpl implements Logics {
     private final BoardGame game;
-    private final boolean gameOver;
+    private boolean gameOver;
 
     public LogicsImpl(int size) {
         this.game = new BoardGame(size);
@@ -15,21 +15,18 @@ public class LogicsImpl implements Logics {
     @Override
     public boolean selectCell(int row, int col) {
         Pair<Integer, Integer> pos = new Pair<>(row, col);
-        // Remove flag if present
+
         if (game.isAFlag(pos)) {
             game.removeFlag(pos);
         }
-        // Add selection for the cell
         game.addSelections(pos);
 
-        // If the cell is a bomb, return true (game over)
         if (game.isABomb(pos)) {
+            gameOver = true;
             return true;
         }
 
-        // If no adjacent bombs, recursively explore neighboring cells
         if (game.closeBombs(pos) == 0) {
-            // Explore each neighboring cell (excluding the center cell)
             nearby(pos);
         }
         return false;
@@ -96,13 +93,9 @@ public class LogicsImpl implements Logics {
      * @param pos the starting cell position for exploration
      */
     private void exploreNoBombs(Pair<Integer, Integer> pos) {
-        // Check if the cell is within the board, not already selected, not flagged, and not a bomb
         if (!isValidExploration(pos)) return;
-        // Add the cell to the selections
         game.addSelections(pos);
-        // If there are adjacent bombs, do not explore further from this cell
         if (game.closeBombs(pos) > 0) return;
-        // Recursively explore neighboring cells
         nearby(pos);
     }
 

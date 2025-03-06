@@ -13,7 +13,7 @@ public class BoardGameTest {
 
     @BeforeEach
     void setUp() {
-        board = new BoardGame(10); // Griglia 10x10
+        board = new BoardGame(10);
     }
 
     @Test

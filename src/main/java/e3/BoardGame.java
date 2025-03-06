@@ -19,13 +19,23 @@ public class BoardGame {
     private final Difficulty difficulty;
 
     /**
-     * Initializes the board with a given size and sets up the bombs.
+     * Initializes the board with a given size and default difficulty (EASY).
      *
      * @param size the dimension of the board (size x size)
      */
     public BoardGame(int size) {
+        this(size, Difficulty.EASY);
+    }
+
+    /**
+     * Initializes the board with a given size and specified difficulty.
+     *
+     * @param size the dimension of the board (size x size)
+     * @param difficulty the difficulty level for bomb density.
+     */
+    public BoardGame(int size, Difficulty difficulty) {
         this.size = size;
-        this.difficulty = Difficulty.EASY;  // You could add a constructor parameter to choose difficulty
+        this.difficulty = difficulty;
         this.bombs = new HashSet<>();
         this.selections = new HashSet<>();
         this.flags = new HashSet<>();
@@ -76,15 +86,6 @@ public class BoardGame {
      */
     public Set<Pair<Integer, Integer>> getSelections() {
         return Collections.unmodifiableSet(selections);
-    }
-
-    /**
-     * Returns an unmodifiable set of flagged cell positions.
-     *
-     * @return flagged cell positions
-     */
-    public Set<Pair<Integer, Integer>> getFlags() {
-        return Collections.unmodifiableSet(flags);
     }
 
     /**
