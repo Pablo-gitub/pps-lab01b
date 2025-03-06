@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ public class BoardGameTest {
     @Test
     void testBombPlacement() {
         int expectedBombs = 10;
-        List<Pair<Integer, Integer>> bombList = board.getBombs();
+        Set<Pair<Integer, Integer>> bombList = board.getBombs();
         assertEquals(expectedBombs, bombList.size());
     }
 
