@@ -9,7 +9,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 public class GUI extends JFrame {
 
@@ -26,42 +25,35 @@ public class GUI extends JFrame {
         JPanel panel = new JPanel(new GridLayout(size,size));
         this.getContentPane().add(BorderLayout.CENTER,panel);
 
-        ActionListener onClick = (e)->{
-            final JButton bt = (JButton)e.getSource();
-            final Pair<Integer,Integer> pos = buttons.get(bt);
-            logics.hit(pos.getX(), pos.getY());
-            boolean aMineWasFound = logics.getGame().isABomb(pos); // call the logic here to tell it that cell at 'pos' has been seleced
-            if (aMineWasFound) {
-                quitGame();
-                JOptionPane.showMessageDialog(this, "You lost!!");
-            } else {
-                drawBoard();
-            }
-            boolean isThereVictory = logics.getGame().winGame();// call the logic here to ask if there is victory
-            if (isThereVictory){
-                quitGame();
-                JOptionPane.showMessageDialog(this, "You won!!");
-                System.exit(0);
+        ActionListener leftClick = e -> {
+            JButton button = (JButton) e.getSource();
+            Pair<Integer, Integer> pos = buttons.get(button);
+            boolean bombFound = logics.selectCell(pos.getX(), pos.getY());
+            drawBoard();
+            if (bombFound) {
+                endGameLoss(button);
+            } else if (logics.isVictory()) {
+                endGameWin();
             }
         };
 
-        MouseInputListener onRightClick = new MouseInputAdapter() {
+        MouseInputAdapter rightClick = new MouseInputAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                final JButton bt = (JButton)e.getSource();
-                if (bt.isEnabled()){
-                    final Pair<Integer,Integer> pos = buttons.get(bt);
-                    logics.rightClick(pos.getX(),pos.getY());
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    JButton button = (JButton) e.getSource();
+                    Pair<Integer, Integer> pos = buttons.get(button);
+                    logics.toggleFlag(pos.getX(), pos.getY());
+                    drawBoard();
                 }
-                drawBoard();
             }
         };
 
         for (int i=0; i<size; i++){
             for (int j=0; j<size; j++){
                 final JButton jb = new JButton(" ");
-                jb.addActionListener(onClick);
-                jb.addMouseListener(onRightClick);
+                jb.addActionListener(leftClick);
+                jb.addMouseListener(rightClick);
                 this.buttons.put(jb,new Pair<>(i,j));
                 panel.add(jb);
             }
@@ -70,37 +62,32 @@ public class GUI extends JFrame {
         this.setVisible(true);
     }
 
-    private void quitGame() {
-        this.drawBoard();
-
-        List<Pair<Integer,Integer>> bombs = this.logics.getGame().getBombs();
-        for (var entry: this.buttons.entrySet()) {
+    private void endGameLoss(JButton bombButton) {
+        // Reveal bombs on the board
+        for (Map.Entry<JButton, Pair<Integer, Integer>> entry : buttons.entrySet()) {
+            JButton button = entry.getKey();
             Pair<Integer, Integer> pos = entry.getValue();
-            JButton bt = entry.getKey();
-
-            if (bombs.contains(pos)) {
-                bt.setText("*");
+            if (logics.isBomb(pos.getX(), pos.getY())) {
+                button.setText("*");
             }
         }
+        // Disable only the button that triggered the loss
+        bombButton.setEnabled(false);
+        JOptionPane.showMessageDialog(this, "You lost!!");
+        // Optionally, exit the application: System.exit(0);
+    }
+
+    private void endGameWin() {
+        JOptionPane.showMessageDialog(this, "You won!!");
+        System.exit(0);
     }
 
     private void drawBoard() {
-        List<Pair<Integer,Integer>> disableElement = this.logics.getDisableElement();
-        for (var entry: this.buttons.entrySet()) {
+        for (Map.Entry<JButton, Pair<Integer, Integer>> entry : buttons.entrySet()) {
+            JButton button = entry.getKey();
             Pair<Integer, Integer> pos = entry.getValue();
-            JButton bt = entry.getKey();
-            if(this.logics.getGame().getFlags().contains(pos)){
-                bt.setText("F");
-            } else if (disableElement.contains(pos)) {
-                if(this.logics.getGame().getBombs().contains(pos)){
-                    bt.setText("*");
-                    bt.setEnabled(false);
-                } else {
-                    int closeBombs = this.logics.getGame().closeBombs(pos);
-                    bt.setText(closeBombs == 0 ? "" : String.valueOf(closeBombs));
-                    bt.setEnabled(false);
-                }
-            }
+            button.setText(logics.getCellDisplayValue(pos.getX(), pos.getY()));
+            button.setEnabled(logics.isCellEnabled(pos.getX(), pos.getY()));
         }
     }
 

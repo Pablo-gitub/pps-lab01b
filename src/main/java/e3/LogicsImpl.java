@@ -1,85 +1,131 @@
 package e3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * Implementation of the Logics interface.
+ */
 public class LogicsImpl implements Logics {
-
     private final BoardGame game;
-    private final List<Pair<Integer,Integer>> disableElement;
-    private Pair<Integer,Integer> currentSelection;
-
-
-    public BoardGame getGame() {
-        return this.game;
-    }
-
-    public List<Pair<Integer,Integer>> getDisableElement() {
-        return this.disableElement;
-    }
+    private final boolean gameOver;
 
     public LogicsImpl(int size) {
         this.game = new BoardGame(size);
-        this.disableElement = new ArrayList<Pair<Integer,Integer>>();
+        gameOver = false;
     }
 
-    public boolean hit(int row, int col) {
-        this.currentSelection = new Pair<>(row,col);
-        this.disableElement.removeAll(this.disableElement);
-        this.disableElement.add(this.currentSelection);
-        if (game.isABomb(currentSelection)) {
+    @Override
+    public boolean selectCell(int row, int col) {
+        Pair<Integer, Integer> pos = new Pair<>(row, col);
+        // Remove flag if present
+        if (game.isAFlag(pos)) {
+            game.removeFlag(pos);
+        }
+        // Add selection for the cell
+        game.addSelections(pos);
+
+        // If the cell is a bomb, return true (game over)
+        if (game.isABomb(pos)) {
             return true;
         }
-        if (this.game.closeBombs(this.currentSelection)==0){
-            exploreNoBombs(currentSelection);
+
+        // If no adjacent bombs, recursively explore neighboring cells
+        if (game.closeBombs(pos) == 0) {
+            // Explore each neighboring cell (excluding the center cell)
+            nearby(pos);
         }
-        if (!game.isABomb(currentSelection) && this.game.closeBombs(this.currentSelection)!=0){
-            this.game.addSelections(this.currentSelection);
-        }
-        return game.winGame();
+        return false;
     }
 
-    public void rightClick(int row, int col) {
-        Pair<Integer,Integer> element = new Pair<>(row,col);
-        if(!game.getSelections().contains(element)) {
-            if (game.isAFlag(element)) {
-                game.removeFlag(element);
+    @Override
+    public void toggleFlag(int row, int col) {
+        Pair<Integer, Integer> pos = new Pair<>(row, col);
+        if (!game.getSelections().contains(pos)) {
+            if (game.isAFlag(pos)) {
+                game.removeFlag(pos);
             } else {
-                game.addFlag(element);
+                game.addFlag(pos);
             }
         }
     }
 
-    private void exploreNoBombs(Pair<Integer, Integer> element) {
-        int nearbyBombs = game.closeBombs(element);
-        if (!game.inBoard(element.getX(), element.getY()) ||
-            this.game.getSelections().contains(element) ||
-            game.isAFlag(element) ||
-            game.isABomb(element)) {
-            return;
+    @Override
+    public String getCellDisplayValue(int row, int col) {
+        Pair<Integer, Integer> pos = new Pair<>(row, col);
+        if (game.isAFlag(pos)) return "F";
+        if (game.getSelections().contains(pos)) {
+            return game.isABomb(pos) ? "*" : bombsNearbyText(pos);
         }
+        return "";
+    }
 
-        game.addSelections(element);
-        disableElement.add(element);
+    @Override
+    public boolean isCellEnabled(int row, int col) {
+        Pair<Integer, Integer> pos = new Pair<>(row, col);
+        return !game.getSelections().contains(pos) || game.isAFlag(pos);
+    }
 
-        if (nearbyBombs > 0) {
-            return;
-        }
+    @Override
+    public boolean isVictory() {
+        return game.winGame();
+    }
 
+    @Override
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    @Override
+    public boolean isBomb(int row, int col) {
+        Pair<Integer, Integer> pos = new Pair<>(row, col);
+        return game.isABomb(pos);
+    }
+
+    /**
+     * Returns a string representing the number of adjacent bombs.
+     *
+     * @param pos the position of the cell
+     * @return a string with the count of adjacent bombs or an empty string if none
+     */
+    private String bombsNearbyText(Pair<Integer, Integer> pos) {
+        int count = game.closeBombs(pos);
+        return count == 0 ? "" : String.valueOf(count);
+    }
+
+    /**
+     * Recursively explores adjacent cells if there are no bombs nearby.
+     *
+     * @param pos the starting cell position for exploration
+     */
+    private void exploreNoBombs(Pair<Integer, Integer> pos) {
+        // Check if the cell is within the board, not already selected, not flagged, and not a bomb
+        if (!isValidExploration(pos)) return;
+        // Add the cell to the selections
+        game.addSelections(pos);
+        // If there are adjacent bombs, do not explore further from this cell
+        if (game.closeBombs(pos) > 0) return;
+        // Recursively explore neighboring cells
+        nearby(pos);
+    }
+
+    private void nearby(Pair<Integer, Integer> pos) {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i != 0 || j != 0) {
-                    Pair<Integer, Integer> adjacent = new Pair<>(element.getX() + i, element.getY() + j);
-                    exploreNoBombs(adjacent);
+                    exploreNoBombs(new Pair<>(pos.getX() + i, pos.getY() + j));
                 }
             }
         }
     }
 
-    public boolean gameOver() {
-        return game.isABomb(this.currentSelection);
+    /**
+     * Checks if the specified cell position is valid for exploration.
+     *
+     * @param pos the cell position
+     * @return true if the cell can be explored, false otherwise
+     */
+    private boolean isValidExploration(Pair<Integer, Integer> pos) {
+        return game.inBoard(pos.getX(), pos.getY()) &&
+                !game.getSelections().contains(pos) &&
+                !game.isAFlag(pos) &&
+                !game.isABomb(pos);
     }
-
 }
