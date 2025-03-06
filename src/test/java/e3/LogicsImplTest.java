@@ -59,10 +59,11 @@ public class LogicsImplTest {
     void testGameOverCondition() {
         int i = 0;
         boolean isBomb = false;
-        while (i < 10 && !logics.isGameOver()) {
+        while (i < 10 && !isBomb) {
             int j = 0;
-            while (j < 10 && !logics.isGameOver()) {
-                if (logics.isBomb(i, j)) {
+            while (j < 10 && !isBomb) {
+                isBomb = logics.isBomb(i, j);
+                if (isBomb) {
                     logics.selectCell(i, j);
                 }
                 j++;
